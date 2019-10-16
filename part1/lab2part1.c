@@ -24,6 +24,41 @@ enum args   { MAIN, THREADNUM, CORRECT_ARGC };
 
     int SharedVar = 0;
 
+void SimpleThread(void *args)
+{
+	int which = (int)args;
+	int num, val;
+	for (num = 0; num < 20; num++)
+	{
+		if (random() > RAND_MAX / 2)
+		{
+			usleep(10);
+		}
+
+#ifdef PTHREAD_SYNC
+	pthread_mutex_lock(&mutex);
+#endif // PTHREAD_SYNC
+
+
+		val = SharedVar;
+		printf("*** thread %d sees value %d\n", which, val);
+		SharedVar = val + 1;
+
+#ifdef PTHREAD_SYNC
+	pthread_mutex_unlock(&mutex);
+#endif // PTHREAD_SYNC
+
+	}
+
+#ifdef PTHREAD_SYNC
+	pthread_barrier_wait(&barrier);
+#endif
+	val = SharedVar;
+	printf("Thread %d sees final value %d\n", which, val);
+	
+
+}//end SimpleThread
+
 //Main--------------------------------------------------------------------------
 int main(int argc, char const *argv[]) {
 
@@ -77,37 +112,3 @@ int main(int argc, char const *argv[]) {
 	
 }//end main
 
-void SimpleThread(void *args)
-{
-	int which = (int)args;
-	int num, val;
-	for (num = 0; num < 20; num++)
-	{
-		if (random() > RAND_MAX / 2)
-		{
-			usleep(10);
-		}
-
-#ifdef PTHREAD_SYNC
-	pthread_mutex_lock(&mutex);
-#endif // PTHREAD_SYNC
-
-
-		val = SharedVar;
-		printf("*** thread %d sees value %d\n", which, val);
-		SharedVar = val + 1;
-
-#ifdef PTHREAD_SYNC
-	pthread_mutex_unlock(&mutex);
-#endif // PTHREAD_SYNC
-
-	}
-
-#ifdef PTHREAD_SYNC
-	pthread_barrier_wait(&barrier);
-#endif
-	val = SharedVar;
-	printf("Thread %d sees final value %d\n", which, val);
-	
-
-}//end SimpleThread
