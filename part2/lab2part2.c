@@ -48,7 +48,9 @@ int main(int argc, char const *argv[]) {
     pthread_create(&threadid, &attr, runner, argv[1]);   
     pthread_join(threadid, NULL);
 
-    for (int i = 0; i < fibNum; i++)
+
+    int i;
+    for (i = 0; i < fibNum; i++)
     {
       printf("fib #%-2d: %20lld\n", i + 1, fib[i]);
     }
